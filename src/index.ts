@@ -36,6 +36,41 @@ class LogForwardingPlugin {
     this.hooks = {
       'package:initialize': this.updateResources.bind(this),
     };
+
+    // schema for the function section of serverless.yml
+    this.serverless.configSchemaHandler.defineFunctionProperties('aws', {
+      properties: {
+        logForwarding: { 
+          type: 'object',
+          properties: {
+            enabled: {
+              type: 'boolean'
+            },
+          },
+          required: ['enabled']
+        },
+      },
+      required: []
+    });
+
+    // schema for the custom props section of serverless.yml
+    this.serverless.configSchemaHandler.defineCustomProperties({
+      properties: {
+        logForwarding: {
+          type: 'object',
+          properties: {
+            destinationARN: { type: 'string' },
+            roleArn: { type: 'string'},
+            filterPattern: { type: 'string'},
+            normalizedFilterID: { type: 'string'},
+            stages: { type: 'array', uniqueItems: true, items: { type: 'string' } },
+            createLambdaPermission: { type: 'boolean' },
+          },
+          required: [ 'destinationARN'],
+        }
+      },
+      required: ['logForwarding']
+    })
   }
 
   loadConfig(): void {
